@@ -4105,7 +4105,7 @@ function renderChrome() {
   $("title").textContent = t().title;
   $("lead").textContent = lang === "en"
     ? nQ(BANK.length) + " and " + MODULES.length + " lessons for a maintenance electrician, from the basics and safety to the CEC, electronics, automation, offset printing and die-cutting. A study plan from zero to the Red Seal Industrial Electrician exam."
-    : nQ(BANK.length) + " і " + MODULES.length + " уроків для механіка-електрика: від основ і безпеки до кодексу CEC, електроніки, автоматики, офсету й висічки. План навчання з нуля до іспиту Red Seal Industrial Electrician.";
+    : nQ(BANK.length) + " і " + MODULES.length + " " + plUk(MODULES.length, "урок", "уроки", "уроків") + " для механіка-електрика: від основ і безпеки до кодексу CEC, електроніки, автоматики, офсету й висічки. План навчання з нуля до іспиту Red Seal Industrial Electrician.";
   document.querySelectorAll("#langSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
   const nav = $("tabs");
   nav.setAttribute("aria-label", t().navLabel);
