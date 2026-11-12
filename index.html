@@ -198,6 +198,20 @@ ul.src .sd{font-size:14px;color:var(--muted)}
 .cyl .sen{fill:var(--line);stroke:var(--muted);stroke-width:1.5}
 .cyl .sen.on{fill:var(--good);stroke:var(--good)}
 .cyl text{fill:var(--ink);font-family:var(--font-body);font-size:13px}
+/* words */
+.wcard{display:grid;gap:12px;justify-items:center;text-align:center;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg);padding:24px 16px;min-width:0}
+.wfront{font-family:var(--font-display);font-size:30px;font-weight:700;line-height:1.15;text-wrap:balance;overflow-wrap:anywhere}
+.wfront:focus{outline:none}
+.wback{font-size:22px;font-weight:600;color:var(--accent);line-height:1.3;text-wrap:balance}
+.wnote{font-size:15px;color:var(--muted);max-width:52ch}
+.wex{display:grid;gap:2px;font-size:15px;max-width:52ch}
+.wex i{font-style:normal;color:var(--muted)}
+.say{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;min-height:38px;font-size:14px}
+.say svg{width:18px;height:18px;fill:currentColor}
+.grade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grade .btn{padding:10px 6px}
+.btn.bad{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.btn.good{background:var(--good);border-color:var(--good);color:var(--surface)}
 /* terms & sources */
 input.search{font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px;width:100%}
 .tbl{overflow-x:auto}
@@ -3461,17 +3475,147 @@ Q.elx2.push(
 </script>
 
 <script>
+/* Англійська на роботі: [набір, англійською, українською, приклад EN, приклад UK] */
+const WDECKS_WORK = [
+ { id:"wtools", t:["Інструмент","Tools"] },
+ { id:"wact", t:["Дії й ремонт","Actions and repairs"] },
+ { id:"wsafe", t:["Безпека й ЗІЗ","Safety and PPE"] },
+ { id:"wjob", t:["Робота й зміна","Work and shifts"] },
+ { id:"wphr", t:["Фрази в цеху","Shop-floor phrases"] }
+];
+const WORK = [
+["wtools","wrench","гайковий ключ","Hand me the 9/16 wrench.","Подай ключ на 9/16."],
+["wtools","adjustable wrench","розвідний ключ","Use a box wrench instead of the adjustable wrench.","Візьми накидний ключ замість розвідного."],
+["wtools","socket set","набір торцевих головок","The 13 mm socket is missing from the set.","У наборі бракує головки на 13 мм."],
+["wtools","Robertson screwdriver","викрутка Робертсон (квадратний шліц)","Most screws in Canada take a Robertson screwdriver.","Більшість гвинтів у Канаді — під викрутку Робертсон."],
+["wtools","Phillips screwdriver","хрестова викрутка","",""],
+["wtools","pliers","плоскогубці","",""],
+["wtools","needle-nose pliers","тонкогубці","",""],
+["wtools","side cutters","бокорізи","Cut the zip tie with side cutters.","Переріж хомут бокорізами."],
+["wtools","wire strippers","знімач ізоляції","",""],
+["wtools","crimper","обтискач","Use the right crimper for these ferrules.","Візьми відповідний обтискач для цих гільз."],
+["wtools","Allen key","шестигранний ключ","",""],
+["wtools","tape measure","рулетка","",""],
+["wtools","level","рівень (інструмент)","",""],
+["wtools","flashlight","ліхтарик","",""],
+["wtools","stepladder","стрем’янка","Don’t stand on the top step of the stepladder.","Не ставай на верхню сходинку стрем’янки."],
+["wtools","extension cord","подовжувач","",""],
+["wtools","fish tape","сталева протяжка для проводів","We need a fish tape to pull this wire through the conduit.","Потрібна протяжка, щоб протягнути провід трубою."],
+["wtools","conduit bender","трубогиб","",""],
+["wtools","hacksaw","ножівка по металу","",""],
+["wtools","impact driver","ударний шуруповерт","",""],
+["wtools","vise","лещата","",""],
+["wtools","grease gun","шприц для мастила","Two pumps of the grease gun is enough.","Двох натискань шприца досить."],
+["wtools","pry bar","монтування (ломик)","",""],
+["wtools","mallet","киянка","Tap it in with a rubber mallet.","Підбий гумовою киянкою."],
+["wtools","file","напилок","",""],
+["wact","tighten","затягнути","Tighten the terminal screws to 2 N·m.","Затягни гвинти клем моментом 2 Н·м."],
+["wact","loosen","послабити, відкрутити","",""],
+["wact","replace","замінити","We need to replace the bearing.","Треба замінити підшипник."],
+["wact","install","встановити","",""],
+["wact","remove","зняти, демонтувати","",""],
+["wact","troubleshoot","шукати несправність","I’m troubleshooting the conveyor.","Я шукаю несправність на конвеєрі."],
+["wact","adjust","відрегулювати","",""],
+["wact","lubricate","змастити","",""],
+["wact","calibrate","відкалібрувати","",""],
+["wact","wire up","підключити проводи","Wire up the new sensor to input X5.","Підключи новий датчик на вхід X5."],
+["wact","splice","з’єднати (зростити) проводи","Don’t splice inside the conduit.","Не з’єднуй проводи всередині труби."],
+["wact","de-energize","знеструмити","",""],
+["wact","lock out","заблокувати замком (LOTO)","Lock out the press before you open the guard.","Заблокуй прес, перш ніж відкривати огородження."],
+["wact","reset","скинути (повернути в робочий стан)","Reset the overload and try again.","Скинь реле перевантаження й спробуй ще раз."],
+["wact","trip","спрацювати, вибити (про захист)","The breaker tripped again.","Автомат знову вибило."],
+["wact","jam","заклинити, застрягти","The sheets jammed in the feeder.","Аркуші застрягли в самонакладі."],
+["wact","leak","текти; витік","There’s an oil leak under the pump.","Під насосом витікає масло."],
+["wact","wear out","зноситися","The belts are worn out.","Паси зносилися."],
+["wact","inspect","оглянути, перевірити","",""],
+["wact","swap out","поміняти (одне на інше)","Let’s swap out the sensor and see.","Давай поміняємо датчик і подивимося."],
+["wact","align","відцентрувати, вирівняти","",""],
+["wact","bleed","спустити (повітря з системи)","Bleed the air out of the hydraulic line.","Спусти повітря з гідравлічної лінії."],
+["wsafe","hard hat","каска","",""],
+["wsafe","safety glasses","захисні окуляри","",""],
+["wsafe","hearing protection","засоби захисту слуху","",""],
+["wsafe","steel-toe boots","черевики з металевим носком","",""],
+["wsafe","high-visibility vest","сигнальний жилет","",""],
+["wsafe","hazard","небезпека","",""],
+["wsafe","near miss","небезпечна подія без травм","Report every near miss to your supervisor.","Про кожну небезпечну подію без травм повідомляй керівнику."],
+["wsafe","incident report","звіт про інцидент","",""],
+["wsafe","first aid","перша допомога","",""],
+["wsafe","fire extinguisher","вогнегасник","",""],
+["wsafe","pinch point","місце затискання","Keep your hands away from pinch points.","Тримай руки подалі від місць затискання."],
+["wsafe","guard","огородження","Never run the machine with the guard off.","Не запускай машину зі знятим огородженням."],
+["wsafe","confined space","замкнений (обмежений) простір","You need a permit to enter a confined space.","Для входу в замкнений простір потрібен допуск."],
+["wsafe","fall protection","захист від падіння з висоти","",""],
+["wsafe","safety data sheet (SDS)","паспорт безпеки речовини","Check the SDS before using that solvent.","Перед використанням розчинника переглянь паспорт безпеки."],
+["wsafe","WHMIS","канадська система маркування небезпечних матеріалів","",""],
+["wsafe","housekeeping","порядок і чистота на робочому місці","",""],
+["wjob","shift","зміна","I’m on night shift this week.","Цього тижня я в нічну зміну."],
+["wjob","overtime","понаднормові години","",""],
+["wjob","supervisor","керівник, старший","",""],
+["wjob","foreman","майстер","",""],
+["wjob","work order","наряд (заявка) на роботу","Open a work order for the leaking valve.","Створи наряд на клапан, що тече."],
+["wjob","downtime","простій","",""],
+["wjob","breakdown","поломка, аварійна зупинка","",""],
+["wjob","spare part","запчастина","",""],
+["wjob","stores","склад запчастин","Check if stores has a 6205 bearing.","Перевір, чи є на складі підшипник 6205."],
+["wjob","preventive maintenance (PM)","планово-попереджувальне обслуговування","",""],
+["wjob","shutdown","зупинка (планова)","",""],
+["wjob","start-up","пуск","",""],
+["wjob","logbook","журнал","",""],
+["wjob","shift handover","передача зміни","",""],
+["wjob","journeyperson","кваліфікований робітник із сертифікатом","",""],
+["wjob","apprentice","учень (апрентис)","",""],
+["wjob","root cause","першопричина","Fix the root cause, not just the symptom.","Усувай першопричину, а не лише симптом."],
+["wjob","punch list","список недоробок","",""],
+["wphr","Is it locked out?","Воно заблоковане (замок LOTO стоїть)?","",""],
+["wphr","The machine is down.","Машина стоїть (не працює).","",""],
+["wphr","It keeps tripping.","Його постійно вибиває.","",""],
+["wphr","Can you give me a hand?","Можеш допомогти?","",""],
+["wphr","Can you double-check this?","Можеш перевірити ще раз?","",""],
+["wphr","Out of order","Не працює (несправне)","",""],
+["wphr","Heads up!","Обережно! Увага!","",""],
+["wphr","Stand clear!","Відійди!","",""],
+["wphr","Watch your step.","Дивись під ноги.","",""],
+["wphr","It’s running fine now.","Тепер працює нормально.","",""],
+["wphr","We’re behind schedule.","Ми відстаємо від графіка.","",""],
+["wphr","I’ll take a look.","Я подивлюся.","",""],
+["wphr","What’s the part number?","Який номер запчастини?","",""],
+["wphr","It’s making a weird noise.","Воно дивно шумить.","",""],
+["wphr","Shut it down.","Зупини її.","",""],
+["wphr","Fire it up.","Запускай.","",""],
+["wphr","Bump the motor.","Коротко ввімкни двигун.","Bump the motor to check rotation.","Коротко ввімкни двигун, щоб перевірити напрямок обертання."],
+["wphr","Is that panel live?","Цей щит під напругою?","",""],
+["wphr","Megger it.","Перевір мегомметром.","",""],
+["wphr","Run a cable.","Прокласти кабель.","",""],
+["wphr","Pull wire.","Протягнути провід.","",""],
+["wphr","Tie it in.","Підключи до наявної системи.","",""],
+["wphr","Call it in.","Повідом про це (диспетчеру, майстру).","",""],
+["wphr","Ballpark figure","Приблизна цифра","Give me a ballpark figure for the repair time.","Скажи приблизно, скільки часу займе ремонт."]
+];
+</script>
+
+<script>
 const T = {
   uk:{
     title:"Тренажер техобслуговування",
-    tabs:{learn:"Навчання", tests:"Тести", terms:"Терміни", sources:"Література"},
+    tabs:{learn:"Навчання", tests:"Тести", terms:"Слова", sources:"Література"},
     navLabel:"Розділи",
     howTitle:"Як вчитися",
-    howto:"Іди етапами згори вниз. Щодня: урок, його контрольний тест, потім помилки, які на сьогодні в розкладі. Практичні завдання з кожного уроку роби в цеху разом із наставником. Поріг — 70 %, як на іспиті Red Seal.",
+    howto:"Іди етапами згори вниз. Щодня: урок, його контрольний тест, потім помилки, які на сьогодні в розкладі. Практичні завдання з кожного уроку роби в цеху разом із наставником. Ще 10–15 хвилин — англійські слова на вкладці «Слова». Поріг — 70 %, як на іспиті Red Seal.",
     planPace:"Темп: 30–45 хвилин на день, 5 днів на тиждень. Увесь план — орієнтовно 6–8 місяців.",
     labTitle:"Лабораторія ПЛК", labIntro:"Модель ПЛК сканує програму кожні 100 мс, як справжній FX. Тисни кнопки й дивись на програму в режимі моніторингу: замкнені контакти й увімкнені котушки підсвічені.",
     labIn:"Входи", labOut:"Виходи", labNC:"підключена NC", labFault:"Несправність: обрив", labTry:"Спробуй", labProg:"Програма (моніторинг)", labScen:"Сценарій", labReset:"Скинути модель",
     labHold:"Тримай, щоб натиснути", labUnit:" с",
+    wTitle:"Англійські слова", wTrain:"Тренування", wDict:"Словник",
+    wIntro:"Картки з інтервальним повторенням: слово, яке пам’ятаєш, повертається через 1, 3, 7, 14, 30 і 60 днів, а забуте — одразу ж. 10–15 хвилин щодня дають більше, ніж година раз на тиждень.",
+    wLearned:"Вивчено (інтервал від 7 днів)", wDueNew:(d,n)=>"До повторення сьогодні: "+d+" · ще не бачених: "+n,
+    wWork:"Англійська на роботі", wTermsGrp:"Терміни з уроків",
+    wDir:"Напрямок", wDirEn:"EN → УКР", wDirUk:"УКР → EN", wMode:"Режим", wCards:"Картки", wQuiz:"Тест",
+    wStart:n=>"Почати: "+n+" "+plUk(n,"слово","слова","слів"),
+    wNone:"У вибраних наборах на сьогодні все повторено. Обери інші набори або повернися завтра.", wPractice:"Повторити все одно", wNoDecks:"Обери хоча б один набір нижче.",
+    wWord:(i,n)=>"Слово "+i+" з "+n, wShow:"Показати переклад", wAgain:"Не знав", wHard:"Важко", wGood:"Знав", wSay:"Прослухати",
+    wHint:"Пробіл — показати переклад, 1 / 2 / 3 — оцінка.", wHintQ:"Клавіші 1–4 обирають відповідь, Enter — далі.",
+    wDone:"Сесію завершено", wKnew:(k,n)=>"З першої спроби правильно: "+k+" з "+n+". Забуті слова повернуться сьогодні або завтра.",
+    wMore:"Ще сесія", wBack:"До слів", wsDue:n=>"Слова на сьогодні ("+n+")",
     bkTitle:"Резервна копія прогресу",
     bkIntroApp:"Прогрес зберігається на цьому пристрої. Збережи його у файл, щоб перенести на інший пристрій або не втратити при очищенні браузера. Файл відкривається й у веб-версії тренажера.",
     bkIntroArt:"Тут прогрес синхронізується з акаунтом Claude. Щоб перенести його в офлайн-програму, скопіюй код прогресу й встав його там. Так само сюди можна відкрити файл, збережений в офлайн-програмі.",
@@ -3553,14 +3697,25 @@ const T = {
   },
   en:{
     title:"Maintenance Trainer",
-    tabs:{learn:"Learn", tests:"Tests", terms:"Terms", sources:"Sources"},
+    tabs:{learn:"Learn", tests:"Tests", terms:"Words", sources:"Sources"},
     navLabel:"Sections",
     howTitle:"How to study",
-    howto:"Work through the stages from the top. Each day: a lesson, its check test, then the mistakes scheduled for today. Do each lesson’s practice tasks in the plant with a mentor. The pass mark is 70%, like the Red Seal exam.",
+    howto:"Work through the stages from the top. Each day: a lesson, its check test, then the mistakes scheduled for today. Do each lesson’s practice tasks in the plant with a mentor. Add 10–15 minutes of English words on the Words tab. The pass mark is 70%, like the Red Seal exam.",
     planPace:"Pace: 30–45 minutes a day, 5 days a week. The whole plan takes roughly 6–8 months.",
     labTitle:"PLC lab", labIntro:"The model PLC scans its program every 100 ms, like a real FX. Press the buttons and watch the program in monitor mode: closed contacts and energized coils are highlighted.",
     labIn:"Inputs", labOut:"Outputs", labNC:"wired NC", labFault:"Fault: open wire", labTry:"Try it", labProg:"Program (monitor)", labScen:"Scenario", labReset:"Reset model",
     labHold:"Hold to press", labUnit:" s",
+    wTitle:"English words", wTrain:"Practice", wDict:"Dictionary",
+    wIntro:"Spaced-repetition cards: a word you remember comes back after 1, 3, 7, 14, 30 and 60 days; a forgotten one comes back right away. 10–15 minutes a day beats an hour once a week.",
+    wLearned:"Learned (interval of 7+ days)", wDueNew:(d,n)=>"Due today: "+d+" · not seen yet: "+n,
+    wWork:"English at work", wTermsGrp:"Terms from the lessons",
+    wDir:"Direction", wDirEn:"EN → UKR", wDirUk:"UKR → EN", wMode:"Mode", wCards:"Cards", wQuiz:"Quiz",
+    wStart:n=>"Start: "+n+(n===1?" word":" words"),
+    wNone:"Everything in these sets is reviewed for today. Pick other sets or come back tomorrow.", wPractice:"Practise anyway", wNoDecks:"Pick at least one set below.",
+    wWord:(i,n)=>"Word "+i+" of "+n, wShow:"Show translation", wAgain:"Didn’t know", wHard:"Hard", wGood:"Knew it", wSay:"Listen",
+    wHint:"Space shows the translation, 1 / 2 / 3 grade it.", wHintQ:"Keys 1–4 pick an answer, Enter goes next.",
+    wDone:"Session complete", wKnew:(k,n)=>"Right on the first try: "+k+" of "+n+". Forgotten words come back today or tomorrow.",
+    wMore:"Another session", wBack:"Back to words", wsDue:n=>"Words for today ("+n+")",
     bkTitle:"Progress backup",
     bkIntroApp:"Progress is stored on this device. Save it to a file to move it to another device or keep it safe if browser data is cleared. The file also opens in the web version of the trainer.",
     bkIntroArt:"Here progress syncs with your Claude account. To move it into the offline app, copy the progress code and paste it there. You can also open a file saved from the offline app here.",
@@ -3662,6 +3817,10 @@ const BANK = [];
 for (const m of MODULES) (Q[m.id] || []).forEach((r, i) => BANK.push({ id: m.id + "-" + (i + 1), c: m.id, r }));
 const BY_ID = Object.fromEntries(BANK.map(q => [q.id, q]));
 const MOD = Object.fromEntries(MODULES.map(m => [m.id, m]));
+const slug = s => s.toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const WORDS = [], WBY = {};
+WORK.forEach(r => { const w = { id: "w-" + slug(r[1]), deck: r[0], en: r[1], uk: r[2], exEn: r[3], exUk: r[4] }; if (!WBY[w.id]) { WBY[w.id] = w; WORDS.push(w); } });
+MODULES.forEach(m => TERMS.filter(x => x[0] === m.id).forEach(x => { const w = { id: "t-" + slug(x[1]), deck: x[0], en: x[1], uk: x[2], nUk: x[3], nEn: x[4] }; if (!WBY[w.id]) { WBY[w.id] = w; WORDS.push(w); } }));
 
 /* ---------- dates ---------- */
 const pad2 = n => String(n).padStart(2, "0");
@@ -3680,13 +3839,15 @@ function sanitize(s) {
   if (isObj(s.prac)) for (const [k, v] of Object.entries(s.prac)) if (Array.isArray(v)) prac[k] = v.map(Boolean);
   const days = {};
   if (isObj(s.days)) for (const [k, v] of Object.entries(s.days)) if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Number(v) > 0) days[k] = Number(v);
+  const words = {};
+  if (isObj(s.words)) for (const [k, v] of Object.entries(s.words)) if (WBY[k] && isObj(v) && typeof v.due === "string") words[k] = { b: Math.max(0, Math.min(6, Number(v.b) || 0)), due: v.due, t: Number(v.t) || 0 };
   return {
     mistakes: Array.isArray(s.mistakes) ? s.mistakes.filter(id => BY_ID[id]) : [],
     stats: isObj(s.stats) ? s.stats : {},
     last: isObj(s.last) ? s.last : null,
     mods: isObj(s.mods) ? s.mods : {},
     exams: Array.isArray(s.exams) ? s.exams.filter(x => isObj(x) && typeof x.r === "number" && typeof x.t === "number").slice(-10) : [],
-    srs, prac, days,
+    srs, prac, days, words,
     updatedAt: Number(s.updatedAt) || 0
   };
 }
@@ -3695,10 +3856,11 @@ function load() {
   try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
   const out = sanitize(s);
   out.lang = s && s.lang === "en" ? "en" : "uk";
+  out.wPrefs = s && isObj(s.wPrefs) ? s.wPrefs : null;
   return out;
 }
 const store = load();
-function payload(s) { return { v: 3, mistakes: s.mistakes, stats: s.stats, last: s.last, mods: s.mods, exams: s.exams, srs: s.srs, prac: s.prac, days: s.days, updatedAt: s.updatedAt }; }
+function payload(s) { return { v: 3, mistakes: s.mistakes, stats: s.stats, last: s.last, mods: s.mods, exams: s.exams, srs: s.srs, prac: s.prac, days: s.days, words: s.words, updatedAt: s.updatedAt }; }
 function stable(o) {
   if (Array.isArray(o)) return "[" + o.map(stable).join(",") + "]";
   if (isObj(o)) return "{" + Object.keys(o).sort().map(k => JSON.stringify(k) + ":" + stable(o[k])).join(",") + "}";
@@ -3728,9 +3890,11 @@ function merge(a, b) {
   keys(a.prac, b.prac).forEach(id => { const x = a.prac[id] || [], y = b.prac[id] || [], len = Math.max(x.length, y.length); prac[id] = Array.from({ length: len }, (_, i) => !!(x[i] || y[i])); });
   const days = {};
   keys(a.days, b.days).forEach(d => { days[d] = Math.max(a.days[d] || 0, b.days[d] || 0); });
+  const words = {};
+  keys(a.words, b.words).forEach(id => { const x = a.words[id], y = b.words[id]; words[id] = !x ? y : !y ? x : ((y.t || 0) > (x.t || 0) ? y : x); });
   const mistakes = newer.mistakes.slice(), srs = {};
   mistakes.forEach(id => { if (newer.srs[id]) srs[id] = newer.srs[id]; });
-  return { mistakes, srs, stats, mods, exams: exams.slice(-10), prac, days, last: newer.last || older.last || null, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0) };
+  return { mistakes, srs, stats, mods, exams: exams.slice(-10), prac, days, words, last: newer.last || older.last || null, updatedAt: Math.max(a.updatedAt || 0, b.updatedAt || 0) };
 }
 
 let syncState = "local", remoteRef = null, writing = false, pendingWrite = false, syncTimer = null, retried = false;
@@ -3751,7 +3915,7 @@ async function pushRemote() {
   if (pendingWrite && remoteRef) { pendingWrite = false; pushRemote(); }
 }
 function adopt(merged) {
-  ["mistakes", "srs", "stats", "mods", "exams", "prac", "days", "last", "updatedAt"].forEach(k => { store[k] = merged[k]; });
+  ["mistakes", "srs", "stats", "mods", "exams", "prac", "days", "words", "last", "updatedAt"].forEach(k => { store[k] = merged[k]; });
   saveLocal();
   if (["learn", "tests", "lesson", "sources", "terms"].includes(st.view)) render();
 }
@@ -3814,7 +3978,9 @@ function examReady() {
 let lang = store.lang;
 const st = { tab: "learn", view: "learn", mod: null, cats: new Set(MODULES.map(m => m.id)), len: 10,
   queue: [], i: 0, score: 0, opts: [], picked: null, wrong: [], origin: null, active: false,
-  termQ: "", termCat: "all", exam: null, examLen: 50, examResult: null };
+  termQ: "", termCat: "all", exam: null, examLen: 50, examResult: null,
+  wDecks: new Set(store.wPrefs && Array.isArray(store.wPrefs.decks) ? store.wPrefs.decks : WDECKS_WORK.map(d => d.id)),
+  wDir: store.wPrefs && store.wPrefs.dir === "uk" ? "uk" : "en", wMode: store.wPrefs && store.wPrefs.mode === "quiz" ? "quiz" : "cards", wSub: "train", ws: null };
 
 const t = () => T[lang];
 const L = pair => pair[lang === "en" ? 1 : 0];
@@ -4091,6 +4257,150 @@ function labHtml() {
   </section>`;
 }
 
+
+/* ---------- English word trainer (spaced repetition) ---------- */
+const WSTEPS = [0, 1, 3, 7, 14, 30, 60];
+const CAN_SPEAK = typeof window !== "undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
+const SPK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round"/></svg>';
+function speak(text) {
+  if (!CAN_SPEAK) return;
+  try {
+    const u = new SpeechSynthesisUtterance(text), v = speechSynthesis.getVoices().find(x => /^en[-_](CA|US|GB)/i.test(x.lang));
+    if (v) u.voice = v;
+    u.lang = v ? v.lang : "en-CA"; u.rate = 0.9;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch (e) {}
+}
+function savePrefs() { store.wPrefs = { decks: Array.from(st.wDecks), dir: st.wDir, mode: st.wMode }; saveLocal(); }
+const backOf = w => st.wDir === "en" ? w.uk : w.en;
+function gradeWord(id, g) {
+  const d = today(), s = store.words[id];
+  if (s && s.due > d && g > 0) { s.t = Date.now(); return; }
+  let b = s ? s.b : 0;
+  if (g === 0) b = 0; else if (g === 2) b = Math.min(b + 1, WSTEPS.length - 1);
+  const days = g === 0 ? 0 : g === 1 ? Math.max(1, Math.round(WSTEPS[b] / 2)) : WSTEPS[b];
+  store.words[id] = { b, due: addDays(d, days), t: Date.now() };
+}
+function wordPlan() {
+  const pool = WORDS.filter(w => st.wDecks.has(w.deck)), d = today();
+  const due = pool.filter(w => store.words[w.id] && store.words[w.id].due <= d).sort((a, b) => store.words[a.id].due < store.words[b.id].due ? -1 : 1);
+  const fresh = pool.filter(w => !store.words[w.id]);
+  return { pool, due, fresh, size: Math.min(20, due.length + Math.min(10, fresh.length)) };
+}
+function startWords(practice) {
+  const p = wordPlan();
+  let q;
+  if (practice) q = shuffle(p.pool.slice()).slice(0, 20);
+  else { const nd = Math.min(20, p.due.length); q = shuffle(p.due.slice(0, nd).concat(p.fresh.slice(0, Math.min(10, 20 - nd)))); }
+  if (!q.length) return;
+  st.ws = { queue: q, i: 0, shown: false, picked: null, opts: [], first: new Set(), known: 0, re: {}, total: q.length };
+  prepWord(); Object.assign(st, { tab: "terms", view: "words" }); render(); scrollTop();
+}
+function prepWord() {
+  const ws = st.ws, w = ws.queue[ws.i];
+  ws.shown = false; ws.picked = null; ws.opts = [];
+  if (st.wMode !== "quiz") return;
+  const same = WORDS.filter(x => x.deck === w.deck && x.id !== w.id), src = same.length >= 3 ? same : WORDS.filter(x => x.id !== w.id);
+  const seen = new Set([backOf(w)]), ds = [];
+  for (const x of shuffle(src.slice())) { const b = backOf(x); if (!seen.has(b)) { seen.add(b); ds.push(x); } if (ds.length === 3) break; }
+  ws.opts = shuffle([w].concat(ds));
+}
+function wRecord(w, g) {
+  const ws = st.ws;
+  gradeWord(w.id, g); bumpDay(1);
+  if (!ws.first.has(w.id)) { ws.first.add(w.id); if (g > 0) ws.known++; }
+  if (g === 0 && !ws.re[w.id]) { ws.re[w.id] = 1; ws.queue.push(w); }
+  save();
+}
+function wNext() {
+  const ws = st.ws; if (!ws) return;
+  ws.i++;
+  if (ws.i >= ws.queue.length) { st.view = "wresult"; render(); scrollTop(); return; }
+  prepWord(); render(); ensureTop();
+  const h = $("qText"); if (h) h.focus({ preventScroll: true });
+}
+function wGrade(g) { const ws = st.ws; if (!ws || !ws.shown) return; wRecord(ws.queue[ws.i], g); wNext(); }
+function wPick(k) {
+  const ws = st.ws; if (!ws || ws.picked != null || !ws.opts[k]) return;
+  ws.picked = k;
+  const w = ws.queue[ws.i], ok = ws.opts[k].id === w.id;
+  wRecord(w, ok ? 2 : 0); render();
+  announce(ok ? t().right : t().wrong + backOf(w));
+  const nb = $("nextBtn"); if (nb) { nb.focus({ preventScroll: true }); try { nb.scrollIntoView({ block: "nearest", behavior: smooth() }); } catch (e) {} }
+}
+function wordsSeg() {
+  const sub = st.wSub === "dict" ? "dict" : "train";
+  return `<div class="seg" role="group" aria-label="${esc(t().tabs.terms)}"><button data-act="wsub" data-k="train" aria-pressed="${sub === "train"}">${esc(t().wTrain)}</button><button data-act="wsub" data-k="dict" aria-pressed="${sub === "dict"}">${esc(t().wDict)}</button></div>`;
+}
+function renderWordsTrain() {
+  const p = wordPlan(), learned = p.pool.filter(w => ((store.words[w.id] || {}).b || 0) >= 3).length;
+  const chip = (id, name) => `<button class="chip" data-act="wdeck" data-d="${id}" aria-pressed="${st.wDecks.has(id)}">${esc(name)} <span class="n">${WORDS.filter(w => w.deck === id).length}</span></button>`;
+  const workChips = WDECKS_WORK.map(d => chip(d.id, L(d.t))).join("");
+  const termChips = MODULES.filter(m => WORDS.some(w => w.deck === m.id)).map(m => chip(m.id, L(m.title))).join("");
+  const seg = (act, cur, opts) => opts.map(([v, l]) => `<button data-act="${act}" data-k="${v}" aria-pressed="${cur === v}">${esc(l)}</button>`).join("");
+  const links = k => `<div class="row"><button class="link" data-act="wall" data-k="${k}">${esc(t().all)}</button><button class="link" data-act="wnone" data-k="${k}">${esc(t().none)}</button></div>`;
+  const action = !p.pool.length ? `<p class="m0">${esc(t().wNoDecks)}</p>`
+    : p.size ? `<button class="btn wide" data-act="wstart">${esc(t().wStart(p.size))}</button>`
+    : `<p class="m0">${esc(t().wNone)}</p><button class="btn ghost wide" data-act="wpractice">${esc(t().wPractice)}</button>`;
+  app.innerHTML = `
+    ${resumeBanner()}
+    ${wordsSeg()}
+    <section class="panel">
+      <h2 class="h2s">${esc(t().wTitle)}</h2>
+      <p class="measure">${esc(t().wIntro)}</p>
+      <div class="row between small"><span>${esc(t().wLearned)}</span><span class="num">${learned} / ${p.pool.length}</span></div>
+      ${bar(learned, p.pool.length)}
+      <p class="small muted m0">${esc(t().wDueNew(p.due.length, p.fresh.length))}</p>
+      <div class="row between"><span class="label">${esc(t().wDir)}</span><div class="seg" role="group" aria-label="${esc(t().wDir)}">${seg("wdir", st.wDir, [["en", t().wDirEn], ["uk", t().wDirUk]])}</div></div>
+      <div class="row between"><span class="label">${esc(t().wMode)}</span><div class="seg" role="group" aria-label="${esc(t().wMode)}">${seg("wmode", st.wMode, [["cards", t().wCards], ["quiz", t().wQuiz]])}</div></div>
+      <div class="row">${action}</div>
+    </section>
+    <div class="row between"><p class="label">${esc(t().wWork)}</p>${links("work")}</div>
+    <div class="row">${workChips}</div>
+    <div class="row between"><p class="label">${esc(t().wTermsGrp)}</p>${links("terms")}</div>
+    <div class="row">${termChips}</div>`;
+}
+function renderTermsTab() { if (st.wSub === "dict") renderTerms(); else renderWordsTrain(); }
+function deckTitle(id) { const d = WDECKS_WORK.find(x => x.id === id); return d ? L(d.t) : modTitle(id); }
+function renderWordSession() {
+  const ws = st.ws, w = ws.queue[ws.i], n = ws.queue.length, quiz = st.wMode === "quiz";
+  const front = st.wDir === "en" ? w.en : w.uk, back = backOf(w);
+  const revealed = quiz ? ws.picked != null : ws.shown;
+  const note = w.nUk ? (lang === "en" ? w.nEn : w.nUk) : "";
+  const ex = w.exEn ? `<div class="wex"><span>${esc(w.exEn)}</span><i>${esc(w.exUk)}</i></div>` : "";
+  const say = CAN_SPEAK && (st.wDir === "en" || revealed) ? `<button type="button" class="say" data-act="wsay">${SPK}${esc(t().wSay)}</button>` : "";
+  const reveal = revealed ? `<div class="wback">${esc(back)}</div>${note ? `<p class="wnote m0">${esc(note)}</p>` : ""}${ex}` : "";
+  let controls;
+  if (!quiz) {
+    controls = ws.shown
+      ? `<div class="grade"><button class="btn bad" data-act="wgrade" data-g="0">1 · ${esc(t().wAgain)}</button><button class="btn ghost" data-act="wgrade" data-g="1">2 · ${esc(t().wHard)}</button><button class="btn good" data-act="wgrade" data-g="2">3 · ${esc(t().wGood)}</button></div>`
+      : `<div class="row"><button class="btn wide" data-act="wshow">${esc(t().wShow)}</button></div><p class="kbd-hint small muted">${esc(t().wHint)}</p>`;
+  } else {
+    const done = ws.picked != null;
+    controls = `<div class="opts" role="group" aria-labelledby="qText">${ws.opts.map((o, k) => {
+      let cls = "opt";
+      if (done) { if (o.id === w.id) cls += " correct"; else if (k === ws.picked) cls += " wrong"; else cls += " dim"; }
+      return `<button class="${cls}" data-act="wpick" data-k="${k}" ${done ? "disabled" : ""}><span class="k">${k + 1}</span><span>${esc(backOf(o))}</span></button>`;
+    }).join("")}</div>` + (done ? `<div class="row"><button class="btn wide" data-act="wnext" id="nextBtn">${esc(t().next)}</button></div>` : `<p class="kbd-hint small muted">${esc(t().wHintQ)}</p>`);
+  }
+  app.innerHTML = `
+    <p class="label">${esc(t().wTitle)} · ${esc(quiz ? t().wQuiz : t().wCards)}</p>
+    <div class="qhead"><span class="num">${esc(t().wWord(ws.i + 1, n))}</span><button class="link" data-act="wquit">${esc(t().exit)}</button></div>
+    ${bar(ws.i, n)}
+    <span class="tag">${esc(deckTitle(w.deck))}</span>
+    <div class="wcard"><div class="wfront" id="qText" tabindex="-1" lang="${st.wDir === "en" ? "en" : "uk"}">${esc(front)}</div>${say}${reveal}</div>
+    ${controls}`;
+}
+function renderWordResult() {
+  const ws = st.ws;
+  app.innerHTML = `
+    <p class="label">${esc(t().wTitle)}</p>
+    <h2 class="h2s">${esc(t().wDone)}</h2>
+    <div class="score"><b>${ws.known} / ${ws.total}</b></div>
+    <p class="m0">${esc(t().wKnew(ws.known, ws.total))}</p>
+    <div class="row"><button class="btn wide" data-act="wmore">${esc(t().wMore)}</button><button class="btn ghost wide" data-act="wback">${esc(t().wBack)}</button></div>`;
+}
+
 const app = $("app");
 
 function renderSync() {
@@ -4153,13 +4463,15 @@ function renderLearn() {
   const done = MODULES.filter(m => (store.mods[m.id] || {}).best >= 70).length;
   const ns = nextStep(), due = dueList().length, dn = store.days[today()] || 0, sk = streak();
   const reviewB = due ? `<button class="btn ghost wide" data-act="reviewq">${esc(t().reviewBtn(due))}</button>` : "";
+  const wdue = WORDS.filter(w => store.words[w.id] && store.words[w.id].due <= today()).length;
+  const extraB = reviewB + (wdue ? `<button class="btn ghost wide" data-act="tab" data-tab="terms">${esc(t().wsDue(wdue))}</button>` : "");
   const nextHtml = ns
     ? `<p class="small muted m0">${esc(t().stage(stageIdx(ns.id) + 1, L(PLAN[stageIdx(ns.id)].t)))}</p>
        <h2 class="h2s">${esc(L(MOD[ns.id].title))}</h2>
        <p class="m0">${esc(t()["next_" + ns.kind])}</p>
-       <div class="row"><button class="btn wide" data-act="open" data-mod="${ns.id}">${esc(t().openLesson)}</button>${reviewB}</div>`
+       <div class="row"><button class="btn wide" data-act="open" data-mod="${ns.id}">${esc(t().openLesson)}</button>${extraB}</div>`
     : `<h2 class="h2s">${esc(t().allDone)}</h2>
-       <div class="row"><button class="btn wide" data-act="tab" data-tab="tests">${esc(t().toMock)}</button>${reviewB}</div>`;
+       <div class="row"><button class="btn wide" data-act="tab" data-tab="tests">${esc(t().toMock)}</button>${extraB}</div>`;
   const stages = PLAN.map((s, i) => {
     const mods = s.mods.map(id => MOD[id]).filter(Boolean);
     const ok = mods.filter(m => (store.mods[m.id] || {}).best >= 70).length;
@@ -4542,6 +4854,7 @@ function renderTerms() {
   const chips = [["all", t().all]].concat(MODULES.map(m => [m.id, L(m.title)]))
     .map(([id, name]) => `<button class="chip" data-act="tcat" data-cat="${id}" aria-pressed="${st.termCat === id}">${esc(name)}</button>`).join("");
   app.innerHTML = `
+    ${wordsSeg()}
     <p class="measure">${esc(t().termsIntro)}</p>
     <label class="label" for="termSearch">${esc(t().search)}</label>
     <input class="search" id="termSearch" type="search" autocomplete="off" value="${esc(st.termQ)}" placeholder="${esc(t().search)}">
@@ -4567,7 +4880,7 @@ function renderSources() {
 }
 
 /* ---------- render loop & events ---------- */
-const FOCUS_ATTRS = ["act", "k", "j", "tab", "cat", "len", "lang", "mod"];
+const FOCUS_ATTRS = ["act", "k", "j", "tab", "cat", "len", "lang", "mod", "d", "g"];
 function focusKey(el) { return el && el.dataset && el.dataset.act ? FOCUS_ATTRS.map(a => el.dataset[a] || "").join("|") : null; }
 function render() {
   const fk = focusKey(document.activeElement);
@@ -4580,7 +4893,9 @@ function render() {
   else if (st.view === "exam" && st.exam) renderExam();
   else if (st.view === "examResult" && st.examResult) renderExamResult();
   else if (st.view === "tests") renderTests();
-  else if (st.view === "terms") renderTerms();
+  else if (st.view === "terms") renderTermsTab();
+  else if (st.view === "words" && st.ws) renderWordSession();
+  else if (st.view === "wresult" && st.ws) renderWordResult();
   else if (st.view === "sources") renderSources();
   else { st.view = "learn"; renderLearn(); }
   if (fk) {
@@ -4637,7 +4952,7 @@ document.addEventListener("click", e => {
   else if (a === "xfinish2") finishExam();
   else if (a === "xunans" && st.exam) xgo(Math.max(0, st.exam.ans.findIndex(x => x == null)));
   else if (a === "xquit") { Object.assign(st, { tab: "tests", view: "tests" }); render(); scrollTop(); }
-  else if (a === "tcat") { st.termCat = b.dataset.cat; renderTerms(); }
+  else if (a === "tcat") { st.termCat = b.dataset.cat; renderTermsTab(); }
   else if (a === "bkfile") {
     try {
       const url = URL.createObjectURL(new Blob([exportText()], { type: "application/json" }));
@@ -4660,6 +4975,23 @@ document.addEventListener("click", e => {
     const ev = window.__installEvt; window.__installEvt = null;
     if (ev) { ev.prompt(); render(); }
   }
+  else if (a === "wsub") { st.wSub = b.dataset.k === "dict" ? "dict" : "train"; render(); }
+  else if (a === "wdeck") { const d = b.dataset.d; st.wDecks.has(d) ? st.wDecks.delete(d) : st.wDecks.add(d); savePrefs(); render(); }
+  else if (a === "wall" || a === "wnone") {
+    const ids = b.dataset.k === "work" ? WDECKS_WORK.map(d => d.id) : MODULES.map(m => m.id);
+    ids.forEach(id => { if (a === "wall") st.wDecks.add(id); else st.wDecks.delete(id); }); savePrefs(); render();
+  }
+  else if (a === "wdir") { st.wDir = b.dataset.k === "uk" ? "uk" : "en"; savePrefs(); render(); }
+  else if (a === "wmode") { st.wMode = b.dataset.k === "quiz" ? "quiz" : "cards"; savePrefs(); render(); }
+  else if (a === "wstart") startWords(false);
+  else if (a === "wpractice") startWords(true);
+  else if (a === "wshow" && st.ws) { st.ws.shown = true; render(); const g = document.querySelector('[data-act="wgrade"][data-g="2"]'); if (g) g.focus({ preventScroll: true }); }
+  else if (a === "wgrade") wGrade(Number(b.dataset.g) || 0);
+  else if (a === "wpick") wPick(Number(b.dataset.k));
+  else if (a === "wnext") wNext();
+  else if (a === "wsay" && st.ws) speak(st.ws.queue[st.ws.i].en);
+  else if (a === "wquit" || a === "wback") { st.ws = null; Object.assign(st, { tab: "terms", view: "terms", wSub: "train" }); render(); scrollTop(); }
+  else if (a === "wmore") { startWords(false); if (st.view !== "words") { st.ws = null; Object.assign(st, { tab: "terms", view: "terms", wSub: "train" }); render(); scrollTop(); } }
   else if (a === "lsc") { labReset(Number(b.dataset.k) || 0); render(); }
   else if (a === "lreset") { labReset(lab.sc); render(); }
   else if (a === "ltog" || a === "lfault") {
@@ -4702,6 +5034,15 @@ document.addEventListener("keydown", e => {
   if (st.view === "quiz") {
     if (/^[1-4]$/.test(e.key) && st.picked === null) { e.preventDefault(); pick(Number(e.key) - 1); }
     else if (e.key === "Enter" && st.picked !== null && !onControl) { e.preventDefault(); next(); }
+  } else if (st.view === "words" && st.ws) {
+    const ws = st.ws;
+    if (st.wMode !== "quiz") {
+      if ((e.key === " " || e.key === "Enter") && !ws.shown && !onControl) { e.preventDefault(); ws.shown = true; render(); }
+      else if (ws.shown && /^[1-3]$/.test(e.key)) { e.preventDefault(); wGrade(Number(e.key) - 1); }
+    } else {
+      if (/^[1-4]$/.test(e.key) && ws.picked == null) { e.preventDefault(); wPick(Number(e.key) - 1); }
+      else if (e.key === "Enter" && ws.picked != null && !onControl) { e.preventDefault(); wNext(); }
+    }
   } else if (st.view === "exam" && st.exam) {
     if (ae && ae.tagName === "INPUT") return;
     if (/^[1-4]$/.test(e.key)) { e.preventDefault(); xpick(Number(e.key) - 1); }

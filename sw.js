@@ -1,5 +1,5 @@
 /* Офлайн-кеш тренажера. Змініть VERSION, щоб примусово оновити кеш. */
-const VERSION = "mt-202611111325";
+const VERSION = "mt-202611120340";
 const FONTS = "mt-fonts";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 self.addEventListener("install", e => {
